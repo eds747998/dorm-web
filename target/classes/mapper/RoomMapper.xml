@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dormitory.mapper.RoomMapper">
+
+    <!-- 更新宿舍（动态SQL） -->
+    <update id="update" parameterType="com.dormitory.entity.Room">
+        UPDATE room
+        <set>
+            <if test="buildingId != null">building_id = #{buildingId},</if>
+            <if test="roomNum != null">room_num = #{roomNum},</if>
+            <if test="capacity != null">capacity = #{capacity},</if>
+            <if test="occupied != null">occupied = #{occupied},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+        </set>
+        WHERE id = #{id}
+    </update>
+
+</mapper>
+

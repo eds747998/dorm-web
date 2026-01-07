@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dormitory.mapper.RepairMapper">
+
+    <!-- 报修列表分页（关联 sys_user、room、building；根据角色过滤） -->
+    <select id="selectPageWithUserAndRoom" resultType="com.dormitory.dto.RepairListDTO">
+        SELECT
+            r.id,
+            u.name        AS studentName,
+            b.name        AS buildingName,
+            rm.room_num   AS roomNum,
+            CONCAT(b.name, '-', rm.room_num) AS location,
+            r.content,
+            r.status,
+            r.create_time AS createTime
+        FROM repair r
+                 LEFT JOIN sys_user u ON r.student_id = u.id
+                 LEFT JOIN room rm ON r.room_id = rm.id
+                 LEFT JOIN building b ON rm.building_id = b.id
+        <where>
+            <!-- 学生只看自己的报修 -->
+            <if test="role == 1">
+                r.student_id = #{userId}
+            </if>
+            <!-- 管理员不过滤；若未来按楼宇筛选，可在此追加条件 -->
+        </where>
+        ORDER BY r.create_time DESC
+        LIMIT #{offset}, #{size}
+    </select>
+
+    <select id="countWithUserAndRoom" resultType="long">
+        SELECT COUNT(1)
+        FROM repair r
+        <where>
+            <if test="role == 1">
+                r.student_id = #{userId}
+            </if>
+        </where>
+    </select>
+
+    <!-- 更新报修（动态SQL） -->
+    <update id="update" parameterType="com.dormitory.entity.Repair">
+        UPDATE repair
+        <set>
+            <if test="studentId != null">student_id = #{studentId},</if>
+            <if test="roomId != null">room_id = #{roomId},</if>
+            <if test="content != null">content = #{content},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+        </set>
+        WHERE id = #{id}
+    </update>
+
+</mapper>
+
