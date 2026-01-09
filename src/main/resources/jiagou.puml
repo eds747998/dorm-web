@@ -1,0 +1,105 @@
+@startuml
+left to right direction
+skinparam packageStyle rectangle
+
+package "Backend" {
+  package "入口" {
+    node "Application\n@SpringBootApplication" as APP
+  }
+
+  package "Controller (web层)" {
+    node "RoomController\n@RestController" as C_ROOM
+    node "AuthController\n@RestController" as C_AUTH
+  }
+
+  package "Service (业务层)" {
+    node "RoomService\n@Service" as S_ROOM
+    node "AuthService\n@Service" as S_AUTH
+  }
+
+  package "Repository / Mapper (持久层)" {
+    node "RoomMapper\n(MyBatis)" as M_ROOM
+    node "UserMapper\n(MyBatis)" as M_USER
+  }
+
+  package "Domain / Entity" {
+'    node class Room
+'
+@startuml
+' 类图：显示属性与方法以及类之间的关系
+
+left to right direction
+skinparam classAttributeIconSize 0
+
+package "com.dormitory.controller" {
+  class LoginController {
+    - SysUserMapper sysUserMapper
+    + hello() : String
+    + login(loginDTO : LoginDTO) : Result<SysUser>
+  }
+}
+
+package "com.dormitory.dto" {
+  class LoginDTO {
+    - String username
+    - String password
+    - Integer role
+    + getUsername() : String
+    + setUsername(u : String) : void
+    + getPassword() : String
+    + setPassword(p : String) : void
+    + getRole() : Integer
+    + setRole(r : Integer) : void
+  }
+}
+
+package "com.dormitory.entity" {
+  class SysUser {
+    - Long id
+    - String username
+    - String password
+    - Integer role
+    + getId() : Long
+    + setId(id : Long) : void
+    + getUsername() : String
+    + setUsername(u : String) : void
+    + getPassword() : String
+    + setPassword(p : String) : void
+    + getRole() : Integer
+    + setRole(r : Integer) : void
+  }
+}
+
+package "com.dormitory.mapper" {
+  interface SysUserMapper {
+    + selectByUsername(username : String) : SysUser
+    // 其他持久层方法...
+  }
+}
+
+package "com.dormitory.common" {
+  class Result<T> {
+    - Integer code
+    - String message
+    - T data
+    + static success(msg : String, data : T) : Result<T>
+    + static error(msg : String) : Result<T>
+    + getCode() : Integer
+    + getMessage() : String
+    + getData() : T
+  }
+}
+
+' 关系
+LoginController --> SysUserMapper : uses / autowired
+LoginController ..> LoginDTO : parameter
+LoginController --> Result : returns
+SysUserMapper --> SysUser : returns
+SysUser <|-- LoginDTO : (data mapping / fields overlap)
+
+note right of SysUserMapper
+  MyBatis mapper
+  实际实现由框架生成
+end note
+
+@enduml

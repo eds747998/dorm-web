@@ -1,0 +1,29 @@
+@startuml
+'设置显示样式为垂直方向
+skinparam direction TOP_TO_BOTTOM
+
+entity "Building (宿舍楼)" as building {
+  * id : bigint <<PK>>
+  --
+  name : varchar
+  admin_name : varchar
+}
+
+entity "Room (房间)" as room {
+  * id : bigint <<PK>>
+  --
+  building_id : bigint<<FK>>
+  room_num : varchar
+  capacity : int
+}
+
+entity "User (用户)" as user {
+  * id : bigint <<PK>>
+  --
+  username : varchar
+  room_id : bigint <<FK>>
+}
+
+building ||--o{ room : "拥有"
+room ||--o{ user : "居住"
+@enduml
